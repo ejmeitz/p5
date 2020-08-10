@@ -1,3 +1,7 @@
+
+let r = 0;
+let c = 0;
+
 function setup() {
   createCanvas(windowWidth, windowHeight)
   background(255);
@@ -11,6 +15,9 @@ function setup() {
 
   noFill();
   rect(0, 0, windowWidth, windowHeight);
+
+  c = (windowHeight / 3);
+  r = (windowWidth / 3);
 }
 
 let imgX;
@@ -34,15 +41,11 @@ let bins = [
   [8, 9, 10]
 ]; //instantiate as non repeating numbers--a bit hard codey but its just tic tac toe
 
-
 function mouseClicked() {
   //prevent clicking after game is over
   if (turn >= 9 || playerWon) {
     return;
   }
-
-  let c = (windowHeight / 3);
-  let r = (windowWidth / 3);
 
   let x = mouseX;
   let y = mouseY;
@@ -143,7 +146,31 @@ function resetCanvas() {
   setup();
 }
 
+//when window resizes redraw and update r,c values
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  setup();
+
+  //resize clears canvas so re draw everything
+  stroke(0, 0, 0);
+  line(windowWidth / 3, 0, windowWidth / 3, windowHeight);
+  line(2 * windowWidth / 3, 0, 2 * windowWidth / 3, windowHeight);
+
+  line(0, windowHeight / 3, windowWidth, windowHeight / 3);
+  line(0, 2 * windowHeight / 3, windowWidth, 2 * windowHeight / 3);
+
+  noFill();
+  rect(0, 0, windowWidth, windowHeight);
+
+  c = (windowHeight / 3);
+  r = (windowWidth / 3);
+  for(let i = 0; i < 3 ; i++){
+    for(let j = 0; j < 3 ; j++){
+        if(bins[i][j] === 0){
+            image(imgO, r * i, c * j, windowWidth / 3, windowHeight / 3);
+        }
+        if(bins[i][j] === 1){
+            image(imgX, r * i, c * j, windowWidth / 3, windowHeight / 3);
+        }
+    }
+  }
 }
