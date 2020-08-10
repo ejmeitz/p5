@@ -115,7 +115,7 @@ function winMessage(turn) {
   rect(0, 0, windowWidth, windowHeight);
   textSize(28);
   if (turn === 0) {
-    text("The X's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, w / 2, windowHeight); //above X's are 1 but the turn flips before this gets called so its backwards
+    text("The X's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight); //above X's are 1 but the turn flips before this gets called so its backwards
     setTimeout(resetCanvas, 1200);
   } else {
     text("The O's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
@@ -146,7 +146,6 @@ function resetCanvas() {
   setup();
 }
 
-//when window resizes redraw and update r,c values
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 
