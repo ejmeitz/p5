@@ -25,11 +25,18 @@ function preload() {
 //turn = 0 : X          // turn = 1 : O
 let turn = 0;
 let move = 0;
+let playerWon = false;
 
 //each sub array is a column
 let bins = [[2, 3 ,4], [5 ,6 ,7] ,[8, 9, 10]];  //instantiate as non repeating numbers--a bit hard codey but its just tic tac toe
 let k = (500/3);
 function mouseClicked(){
+  //prevent clicking after game is over
+  if(turn >= 9 || playerWon){
+      return;
+  }
+
+
   let x = mouseX;
   let y = mouseY;
 
@@ -52,15 +59,17 @@ function mouseClicked(){
   }
 
   move = move + 1;
-  let playerWon = checkWin(bins);
+  playerWon = checkWin(bins);
 
   if(playerWon){
     console.log("Game Over");
     winMessage(turn);
+    return;
   }
   if(move === 9 && playerWon === false){
       console.log("Draw");
       drawMessage();
+      return;
   }
 }
 
@@ -94,22 +103,22 @@ function checkWin(bins){
 function winMessage(turn){
   fill('rgba(0,255,0, 0.25)')
   rect(0, 0, w, h);
-  rect(0, 0, w, h);
   textSize(28);
   if(turn === 0){
-      text("The X's Won. Resetting canvas.",0,h/2,w,h); //above X's are 1 but the turn flips before this gets called so its backwards
+      text("The X's Won. Resetting canvas.",w/4,h/2,w/2,h,); //above X's are 1 but the turn flips before this gets called so its backwards
       setTimeout(resetCanvas,1200);
   } else {
-      text("The O's Won. Resetting canvas.",0,h/2,w,h);
+      text("The O's Won. Resetting canvas.",w/4,h/2,w/2,h,);
       setTimeout(resetCanvas,1200);
   }
 }
 
 function drawMessage(){
-    stroke('rgba(0,0,0,0.6)')
+
+    fill('rgba(192,192,192,0.6)')
     rect(0, 0, w, h);
     textSize(28);
-    text("Draw. Resetting canvas.",0,h/2,w,h);
+    text("Draw. Resetting canvas.",w/4,h/2,w/2,h);
     setTimeout(resetCanvas,1200);
 }
 
@@ -119,5 +128,6 @@ function resetCanvas(){
     bins = [[2, 3 ,4], [5 ,6 ,7] ,[8, 9, 10]];
     turn = 0;
     move = 0;
+    playerWon = false;
     setup();
 }
