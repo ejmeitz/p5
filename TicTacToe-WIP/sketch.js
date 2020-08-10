@@ -41,7 +41,7 @@ let bins = [
   [8, 9, 10]
 ]; //instantiate as non repeating numbers--a bit hard codey but its just tic tac toe
 
-function mouseClicked() {
+function mousePressed() {
   //prevent clicking after game is over
   if (turn >= 9 || playerWon) {
     return;
