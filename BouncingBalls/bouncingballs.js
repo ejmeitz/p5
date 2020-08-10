@@ -1,5 +1,5 @@
 let numBalls = 7;
-let diameter = 20;
+let diameter = 40;
 
 let x_pos = []
 let y_pos = []
@@ -42,9 +42,8 @@ function setup() {
 
     //check ball isn't spawned on top of another ball
       if(i >= 1){
-        for(let j = 0; j <= i; j++){
-          let temp = Math.sqrt(Math.pow((x_pos[j] - x_pos[i]), 2) + Math.pow((y_pos[j] - y_pos[i]), 2));
-          console.log(temp);
+        for(let j = 0; j < i; j++){
+          let temp = Math.sqrt(Math.pow((x_pos[j] - x), 2) + Math.pow((y_pos[j] - y), 2));
           if(temp < diameter){
             legal = false;
             break; //try again
@@ -60,7 +59,6 @@ function setup() {
 
     let vx = v_factor * Math.random();
     let vy = v_factor * Math.random();
-
     x_pos.push(x);
     y_pos.push(y);
     x_vel.push(vx);
