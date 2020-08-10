@@ -128,6 +128,7 @@ function drawMessage() {
   fill('rgba(192,192,192,0.6)')
   rect(0, 0, windowWidth, windowHeight);
   textSize(28);
+  fill('rgb(0,0,0,0)')
   text("Draw. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
   setTimeout(resetCanvas, 1200);
 }
