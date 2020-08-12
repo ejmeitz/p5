@@ -43,40 +43,30 @@ function createRandomConnectivity(nodes, maxConnections){
         let y1 = (nodes[i].y );
         let x2 = (nodes[connectedNodeValue].x);
         let y2 = (nodes[connectedNodeValue].y);
-        strokeWeight(3);
 
-        let legalCount = 0;
+        //this needs to be run after everything
         let linePassesThru = Infinity; //ignores case where line passes thru two nodes
         nodes.forEach( w => {
             if(w.value != i && w.value != connectedNodeValue){ //don't want to check if current node or connected node
-                if(!checkLineThruCircle(w, x1, y1, x2, y2)){
-                  legalCount += 1;
-                } else {
-                  linePassesThru = w.value;
+                if(checkLineThruCircle(w, x1, y1, x2, y2)){
+                    linePassesThru = w.value;
+                    console.log(linePassesThru);
                 }
             }
         });
-        if(legalCount === numNodes - 2){ //if line doesn't pass thru other nodes
-        //  line(x1,y1,x2,y2);
-        } else {
-           if(!nodes[i].neighbors.includes(linePassesThru)){ //if this node isnt already in neighbors add it!
-              nodes[i].neighbors.push(linePassesThru);
-              nodes[linePassesThru].neighbors.push(nodes[i]);
-           }
-        }
-
       }
   }
   //sort neighbors lowest to highest just to theres some method to the madness when dfs runs
+  //also draw lines here after all the mess above finishes
+  strokeWeight(3);
   for(let i = 0; i < nodes.length; i++){
     nodes[i].neighbors.sort();
     nodes[i].neighbors.forEach(w => {
         line(nodes[w].x,nodes[w].y,nodes[i].x, nodes[i].y);
-    })
-    console.log("N:" + nodes[i].neighbors);
+    });
   }
 
-  console.log(nodes);
+//  console.log(nodes);
 }
 
 function createRandomGrid(){
@@ -125,7 +115,10 @@ function checkLineThruCircle(node, x1, y1, x2, y2){
   let y = node.y;
 
   let dist = Math.abs(a*x + b*y + c)/(Math.sqrt(Math.pow(a,2)+Math.pow(b,2)));
+  console.log(dist);
   if(dist <= 0.5*d){ //then in circle
+    console.log(true);
+    console.log(node.value);
     return true;
   }
   return false;

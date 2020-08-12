@@ -43,7 +43,7 @@ function setup() {
     //check ball isn't spawned on top of another ball
       if(i >= 1){
         for(let j = 0; j < i; j++){
-          let temp = Math.sqrt(Math.pow((x_pos[j] - x), 2) + Math.pow((y_pos[j] - y), 2));
+          let temp = Math.sqrt(Math.pow((x_pos[j] +x_vel[j] - x), 2) + Math.pow((y_pos[j] +y_vel[j] - y), 2));
           if(temp < diameter){
             legal = false;
             break; //try again
