@@ -20,7 +20,7 @@ function dfs(nodes, currentNode, discoveryOrder){
   discoveryOrder.push(currentNode.value);
     currentNode.neighbors.forEach((w) => {
       if(!visitedNodes.includes(w)){
-        dfs(nodes, nodes[w], discoveryOrder); //w is just the .value of the node 
+        dfs(nodes, nodes[w], discoveryOrder); //w is just the .value of the node
       }
     });
 }
@@ -57,17 +57,25 @@ function createRandomConnectivity(nodes, maxConnections){
             }
         });
         if(legalCount === numNodes - 2){ //if line doesn't pass thru other nodes
-          line(x1,y1,x2,y2);
+        //  line(x1,y1,x2,y2);
         } else {
            if(!nodes[i].neighbors.includes(linePassesThru)){ //if this node isnt already in neighbors add it!
               nodes[i].neighbors.push(linePassesThru);
-              line(x1,y1,nodes[linePassesThru].x,nodes[linePassesThru].y);
-              console.log("colission! " + linePassesThru )
+              nodes[linePassesThru].neighbors.push(nodes[i]);
            }
         }
 
       }
   }
+  //sort neighbors lowest to highest just to theres some method to the madness when dfs runs
+  for(let i = 0; i < nodes.length; i++){
+    nodes[i].neighbors.sort();
+    nodes[i].neighbors.forEach(w => {
+        line(nodes[w].x,nodes[w].y,nodes[i].x, nodes[i].y);
+    })
+    console.log("N:" + nodes[i].neighbors);
+  }
+
   console.log(nodes);
 }
 
