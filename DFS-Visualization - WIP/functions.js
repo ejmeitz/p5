@@ -20,13 +20,13 @@ function dfs(nodes, currentNode, discoveryOrder){
   discoveryOrder.push(currentNode.value);
     currentNode.neighbors.forEach((w) => {
       if(!visitedNodes.includes(w)){
-        dfs(nodes, nodes[w], discoveryOrder); //w is just the .value of the node so we can access the actual node by accessing that index
+        dfs(nodes, nodes[w], discoveryOrder); //w is just the .value of the node 
       }
     });
 }
 
 function createRandomConnectivity(nodes, maxConnections){
-  for (let i = 0; i < nodes.length;i++){
+  for (let i = 0; i < nodes.length;i++){ //create connectivity for node i
       let connections = Math.floor(maxConnections * Math.random()) + 1; //plus one cause I don't want zero connections even tho DFS would still work
       for(let j = 0; j < connections ; j++){
         let connectedNodeValue = i; // start with the condition that the node tries to connect to itself so while loop triggers
@@ -44,7 +44,28 @@ function createRandomConnectivity(nodes, maxConnections){
         let x2 = (nodes[connectedNodeValue].x);
         let y2 = (nodes[connectedNodeValue].y);
         strokeWeight(3);
-        line(x1,y1,x2,y2);
+
+        let legalCount = 0;
+        let linePassesThru = Infinity; //ignores case where line passes thru two nodes
+        nodes.forEach( w => {
+            if(w.value != i && w.value != connectedNodeValue){ //don't want to check if current node or connected node
+                if(!checkLineThruCircle(w, x1, y1, x2, y2)){
+                  legalCount += 1;
+                } else {
+                  linePassesThru = w.value;
+                }
+            }
+        });
+        if(legalCount === numNodes - 2){ //if line doesn't pass thru other nodes
+          line(x1,y1,x2,y2);
+        } else {
+           if(!nodes[i].neighbors.includes(linePassesThru)){ //if this node isnt already in neighbors add it!
+              nodes[i].neighbors.push(linePassesThru);
+              line(x1,y1,nodes[linePassesThru].x,nodes[linePassesThru].y);
+              console.log("colission! " + linePassesThru )
+           }
+        }
+
       }
   }
   console.log(nodes);
@@ -82,4 +103,22 @@ function createRandomGrid(){
             nodes.push(temp);
     }
     return nodes;
+}
+
+//checks if any paths pass through the circle (they would be obscured if this happened)
+function checkLineThruCircle(node, x1, y1, x2, y2){
+  let m = (y2-y1)/(x2-x1);
+  //put line into form ax+by+c=0
+  let a = m;
+  let b = -1;
+  let c = (y1-(m*x1));
+
+  let x = node.x;
+  let y = node.y;
+
+  let dist = Math.abs(a*x + b*y + c)/(Math.sqrt(Math.pow(a,2)+Math.pow(b,2)));
+  if(dist <= 0.5*d){ //then in circle
+    return true;
+  }
+  return false;
 }

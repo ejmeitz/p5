@@ -33,7 +33,13 @@ function setup() {
 
   // run recursive dfs to get discovery order
   let discoveryOrder = []; //right now they're stored as values not the actual node object
-  dfs(nodes, nodes[0], discoveryOrder);
+
+  for(let i = 0; i < numNodes; i++){
+    let start = nodes[i];
+    if(!start.visited){ //try starting on all nodes incase graph is disconnected
+      dfs(nodes, start, discoveryOrder);
+    }
+  }
   console.log("Discovery Order:" + discoveryOrder);
 }
 
