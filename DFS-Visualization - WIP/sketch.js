@@ -5,7 +5,7 @@ let visitedNodes = [];
 
 class Node {
   constructor(x, y, value) {
-   this.neighbors = [];
+   this.neighbors = new Set;
    this.x = x; //grid x val (0-4)
    this.y = y; //grid y val (0-4)
    this.value = value;
@@ -16,7 +16,6 @@ class Node {
 function setup() {
   createCanvas(windowWidth,windowHeight)
   let nodes = createRandomGrid();
-
 //the second param can be a decimal 1.25 means on average given infinity nodes they will have 1.25 connections originating from them or 2.5 total
   createRandomConnectivity(nodes,1.5); //this is first so the lines stay behind the circles;
 

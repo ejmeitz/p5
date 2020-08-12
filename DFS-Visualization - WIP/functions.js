@@ -26,50 +26,46 @@ function dfs(nodes, currentNode, discoveryOrder){
 }
 
 function createRandomConnectivity(nodes, maxConnections){
-  for (let i = 0; i < nodes.length;i++){ //create connectivity for node i
+
+
+  for (let i = 0; i < nodes.length; i++){ //create connectivity for node i
+
       let connections = Math.floor(maxConnections * Math.random()) + 1; //plus one cause I don't want zero connections even tho DFS would still work
+
       for(let j = 0; j < connections ; j++){
+
         let connectedNodeValue = i; // start with the condition that the node tries to connect to itself so while loop triggers
-        while(connectedNodeValue == nodes[i].value || nodes[i].neighbors.includes(connectedNodeValue)){ // if the node tries to connect to itself or a node its already connected to try again
+        while(connectedNodeValue === i || nodes[i].neighbors.has(connectedNodeValue)){ // if the node tries to connect to itself or a node its already connected to try again
             connectedNodeValue = Math.floor(numNodes*Math.random());
         }
-        nodes[i].neighbors.push(connectedNodeValue);
-        if(!nodes[connectedNodeValue].neighbors.includes(i)){
-          nodes[connectedNodeValue].neighbors.push(i);
+
+          for(let k = 0; k < nodes.length; k++){ //check if this connection will pass thru another node
+              if(k !== i && k !== connectedNodeValue){ //don't want to check if current node or connected node
+                  if(checkLineThruCircle(nodes[i], nodes[connectedNodeValue], nodes[k])){
+                      console.log(i + " collided with " + k + " when trying to connect to " + connectedNodeValue);
+                      connectedNodeValue = k; //change it so the connection just goes to that intermediate node
+                  }
+              }
         }
+        nodes[i].neighbors.add(connectedNodeValue);
+        nodes[connectedNodeValue].neighbors.add(i); //set wont allow duplicate to be added so we dont check
 
-        //draw lines
-        let x1 = (nodes[i].x );
-        let y1 = (nodes[i].y );
-        let x2 = (nodes[connectedNodeValue].x);
-        let y2 = (nodes[connectedNodeValue].y);
-
-        //this needs to be run after everything
-        let linePassesThru = Infinity; //ignores case where line passes thru two nodes
-        nodes.forEach( w => {
-            if(w.value != i && w.value != connectedNodeValue){ //don't want to check if current node or connected node
-                if(checkLineThruCircle(w, x1, y1, x2, y2)){
-                    linePassesThru = w.value;
-                    console.log(linePassesThru);
-                }
-            }
-        });
       }
   }
   //sort neighbors lowest to highest just to theres some method to the madness when dfs runs
   //also draw lines here after all the mess above finishes
   strokeWeight(3);
   for(let i = 0; i < nodes.length; i++){
-    nodes[i].neighbors.sort();
     nodes[i].neighbors.forEach(w => {
         line(nodes[w].x,nodes[w].y,nodes[i].x, nodes[i].y);
     });
   }
 
-//  console.log(nodes);
+  console.log(nodes);
 }
 
 function createRandomGrid(){
+
     let nodes = [];
 
     for(let i = 0; i < numNodes; i++){
@@ -83,42 +79,51 @@ function createRandomGrid(){
 
 
               if(i >= 1){ //check if node overlaps with an already existing node  -- maybe if its even close at all try again
-                for(let j = 0; j < i ; j++){
-                    let dist = Math.sqrt(Math.pow((nodes[j].x - x1),2) + Math.pow((nodes[j].y - y1),2));
-                    if(dist < 8*d){
-                        legal = false;
-                        break; //try again
-                      } else {
-                        legal = true;
-                      }
-                  }
+                 for(let j = 0; j < i ; j++){
+                     let dist = Math.sqrt(Math.pow((nodes[j].x - x1),2) + Math.pow((nodes[j].y - y1),2));
+                     if(dist < 8*d){
+                         legal = false;
+                         break; //try again
+                       } else {
+                         legal = true;
+                       }
+                   }
+
+
+
+
                 } else {
                   break;
                 }
             }
 
             let temp = new Node(x1, y1, i);
-            nodes.push(temp);
+           nodes.push(temp);
+
     }
     return nodes;
 }
 
 //checks if any paths pass through the circle (they would be obscured if this happened)
-function checkLineThruCircle(node, x1, y1, x2, y2){
+function checkLineThruCircle(firstNode, secondNode, inBetweenNode){
+
+  let x1 = firstNode.x;
+  let y1 = firstNode.y
+  let x2 = secondNode.x;
+  let y2 = secondNode.y;
+
+  let x = inBetweenNode.x;
+  let y = inBetweenNode.y;
+
+
   let m = (y2-y1)/(x2-x1);
   //put line into form ax+by+c=0
   let a = m;
   let b = -1;
   let c = (y1-(m*x1));
 
-  let x = node.x;
-  let y = node.y;
-
   let dist = Math.abs(a*x + b*y + c)/(Math.sqrt(Math.pow(a,2)+Math.pow(b,2)));
-  console.log(dist);
   if(dist <= 0.5*d){ //then in circle
-    console.log(true);
-    console.log(node.value);
     return true;
   }
   return false;
