@@ -44,6 +44,7 @@ function createRandomConnectivity(nodes, maxConnections){
                   if(checkLineThruCircle(nodes[i], nodes[connectedNodeValue], nodes[k])){
                       console.log(i + " collided with " + k + " when trying to connect to " + connectedNodeValue);
                       connectedNodeValue = k; //change it so the connection just goes to that intermediate node
+                      //could also connect intermediate to original destination but less edges is better
                   }
               }
         }
@@ -107,14 +108,24 @@ function createRandomGrid(){
 //checks if any paths pass through the circle (they would be obscured if this happened)
 function checkLineThruCircle(firstNode, secondNode, inBetweenNode){
 
+
   let x1 = firstNode.x;
   let y1 = firstNode.y
   let x2 = secondNode.x;
   let y2 = secondNode.y;
 
+  let lowerBoundX = Math.min(x1,x2);
+  let lowerBoundY = Math.min(y1,y2);
+  let upperBoundX = Math.max(x1,x2);
+  let upperBoundY = Math.max(y1,y2);
+
   let x = inBetweenNode.x;
   let y = inBetweenNode.y;
 
+//if node isn't in between the other two don't bother
+  if(x > upperBoundX || x < lowerBoundX || y > upperBoundY || y < lowerBoundY){
+    return false;
+}
 
   let m = (y2-y1)/(x2-x1);
   //put line into form ax+by+c=0
@@ -122,6 +133,7 @@ function checkLineThruCircle(firstNode, secondNode, inBetweenNode){
   let b = -1;
   let c = (y1-(m*x1));
 
+//LIMIT LINE TO THE DOMAIN AND RANGE OF X1-X2 && Y1-Y2
   let dist = Math.abs(a*x + b*y + c)/(Math.sqrt(Math.pow(a,2)+Math.pow(b,2)));
   if(dist <= 0.5*d){ //then in circle
     return true;
