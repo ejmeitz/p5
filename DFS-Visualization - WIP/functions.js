@@ -17,7 +17,7 @@ function getLegalY(diameter) {
 function dfs(nodes, currentNode, discoveryOrder){
   currentNode.visited = true;
   visitedNodes.push(currentNode.value);
-  discoveryOrder.push(currentNode.value);
+  discoveryOrder.push(currentNode);
     currentNode.neighbors.forEach((w) => {
       if(!visitedNodes.includes(w)){
         dfs(nodes, nodes[w], discoveryOrder); //w is just the .value of the node
@@ -57,6 +57,9 @@ function createRandomConnectivity(nodes, maxConnections){
   //also draw lines here after all the mess above finishes
   strokeWeight(3);
   for(let i = 0; i < nodes.length; i++){
+
+    //HOW TO SORT A SET LOWEST TO HIGHEST?
+
     nodes[i].neighbors.forEach(w => {
         line(nodes[w].x,nodes[w].y,nodes[i].x, nodes[i].y);
     });

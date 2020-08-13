@@ -1,11 +1,11 @@
-let numNodes = 7;  // must be less than rows*cols
-let d = 50;
+let numNodes = 6;  // must be less than rows*cols
+let d = 30;
 let visitedNodes = [];
-
+let discoveryOrder = [];
 
 class Node {
   constructor(x, y, value) {
-   this.neighbors = new Set;
+   this.neighbors = new Set();
    this.x = x; //grid x val (0-4)
    this.y = y; //grid y val (0-4)
    this.value = value;
@@ -25,23 +25,34 @@ function setup() {
       let y = nodes[i].y;
       strokeWeight(3);
       circle(x , y , d); //maybe make elipses if needs to be responsive and use boxHeight
-      textSize(30);
+      textSize(20);
       textAlign(CENTER, CENTER);
       text(i, x, y)
   }
 
   // run recursive dfs to get discovery order
-  let discoveryOrder = []; //right now they're stored as values not the actual node object
-
   for(let i = 0; i < numNodes; i++){
     let start = nodes[i];
     if(!start.visited){ //try starting on all nodes incase graph is disconnected
       dfs(nodes, start, discoveryOrder);
     }
   }
-  console.log("Discovery Order:" + discoveryOrder);
+
 }
 
 function draw() {
+  let delay = 1000;
+  for(let i = 0; i < numNodes; i++){
+     setTimeout(animatePath, delay * i, discoveryOrder[i]);
+  }
 
+}
+ function animatePath(node){
+  stroke(0,255,0);
+  noFill();
+  circle(node.x , node.y , d);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
