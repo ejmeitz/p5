@@ -59,7 +59,7 @@ function mouseClicked() {
   if (bins[row][col] === AI_PLAYER || bins[row][col] === HUMAN_PLAYER) {
     return;
   }
-  console.log(bins);
+
   bins[row][col] = HUMAN_PLAYER;
   image(imgX, r * row, c * col, windowWidth / 3, windowHeight / 3);
 
@@ -67,7 +67,6 @@ function mouseClicked() {
   gameOutcome = checkWin(bins);
 
   if (gameOutcome !== null) {
-    console.log("Game Over");
     endMessage(gameOutcome);
     return;
   }
@@ -81,12 +80,9 @@ function mouseClicked() {
   gameOutcome = checkWin(bins);
 
   if(gameOutcome !== null) {
-    console.log(bins);
-    console.log("Game Over");
     endMessage(gameOutcome);
     return;
   }
-  //after AI player board could never be full cause they go second
 
   turn = HUMAN_PLAYER;
 

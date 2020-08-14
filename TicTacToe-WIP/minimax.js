@@ -1,4 +1,4 @@
-let maxDepth = 7;
+let maxDepth = 5; //min depth for AI to at least get a draw always
 let scores = [10, -10, 0]; //[AI_PLAYER, HUMAN_PLAYER, TIE]
 
 
@@ -22,7 +22,6 @@ function bestMove() {
       }
     }
   }
-  console.log("Next Move: " + nextMove);
   return nextMove;
 }
 
