@@ -59,20 +59,16 @@ function mouseClicked() {
   if (bins[row][col] === AI_PLAYER || bins[row][col] === HUMAN_PLAYER) {
     return;
   }
+  console.log(bins);
   bins[row][col] = HUMAN_PLAYER;
   image(imgX, r * row, c * col, windowWidth / 3, windowHeight / 3);
 
   movesPlayed = movesPlayed + 1;
-  playerWon = checkWin(bins, movesPlayed);
+  gameOutcome = checkWin(bins);
 
-  if (playerWon) {
+  if (gameOutcome !== null) {
     console.log("Game Over");
-    winMessage(turn);
-    return;
-  }
-  if (movesPlayed === 9 && playerWon === false) {
-    console.log("Draw");
-    drawMessage();
+    endMessage(gameOutcome);
     return;
   }
 
@@ -80,20 +76,17 @@ function mouseClicked() {
   let aiMove = bestMove();
 
   bins[aiMove[0]][aiMove[1]] = AI_PLAYER; //AI plays the best move it found
-  image(imgO, r * aiMove[1], c * aiMove[0], windowWidth / 3, windowHeight / 3);
+  image(imgO, r * aiMove[0], c * aiMove[1], windowWidth / 3, windowHeight / 3);
   movesPlayed = movesPlayed + 1;
   gameOutcome = checkWin(bins);
 
   if(gameOutcome !== null) {
+    console.log(bins);
     console.log("Game Over");
-    winMessage(gameOutcome);
+    endMessage(gameOutcome);
     return;
   }
-  if (movesPlayed === 9 || playerWon === 2) {
-    console.log("Draw");
-    drawMessage();
-    return;
-  }
+  //after AI player board could never be full cause they go second
 
   turn = HUMAN_PLAYER;
 
@@ -122,15 +115,15 @@ function checkWin(board) {
     return bins[2][0];
   }
 
-  let movesPlayed = 0;
+  let tempMovesPlayed = 0;
   for(let i = 0; i < 3 ; i ++){
     for(let j = 0; j < 3; j++){
         if(board[i][j] === AI_PLAYER || board[i][j] === HUMAN_PLAYER){
-          movesPlayed += 1;
+          tempMovesPlayed += 1;
         }
     }
   }
-  if(movesPlayed === 9){
+  if(tempMovesPlayed === 9){
     return 2; // set as two because score[2] is for a draw
   }
 
@@ -138,28 +131,27 @@ function checkWin(board) {
 }
 
 
-function winMessage(turn) {
-  fill('rgba(0,255,0, 0.25)')
-  rect(0, 0, windowWidth, windowHeight);
+function endMessage(gameOutcome) {
   textSize(28);
-  if (turn === AI_PLAYER) {
+  if (gameOutcome === AI_PLAYER) {
+    fill('rgba(0,255,0, 0.25)')
+    rect(0, 0, windowWidth, windowHeight);
     text("The O's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight); //above X's are 1 but the turn flips before this gets called so its backwards
     setTimeout(resetCanvas, 1200);
-  } else {
+  } else if (gameOutcome === HUMAN_PLAYER) {
+    fill('rgba(0,255,0, 0.25)')
+    rect(0, 0, windowWidth, windowHeight);
     text("The X's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
+    setTimeout(resetCanvas, 1200);
+  } else {
+    fill('rgba(192,192,192,0.6)')
+    rect(0, 0, windowWidth, windowHeight);
+    fill('rgb(0,0,0,0)')
+    text("Draw. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
     setTimeout(resetCanvas, 1200);
   }
 }
 
-function drawMessage() {
-
-  fill('rgba(192,192,192,0.6)')
-  rect(0, 0, windowWidth, windowHeight);
-  textSize(28);
-  fill('rgb(0,0,0,0)')
-  text("Draw. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
-  setTimeout(resetCanvas, 1200);
-}
 
 //reset everything to initial state
 function resetCanvas() {
