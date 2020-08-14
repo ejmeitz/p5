@@ -1,9 +1,24 @@
 
 let r = 0;
 let c = 0;
+let AI_PLAYER = 0; //0's
+let HUMAN_PLAYER = 1; //X's
+
+//turn = 0 : X          // turn = 1 : O
+let turn = HUMAN_PLAYER;
+let movesPlayed = 0;
+let playerWon = false;
+
+//each sub array is a column
+let bins = [
+  [2, 3, 4],
+  [5, 6, 7],
+  [8, 9, 10]
+]; 
+//instantiate as non repeating numbers--a bit hard codey but it could be scaled up with a for loop
 
 function setup() {
-  createCanvas(windowWidth, windowHeight)
+  createCanvas(windowWidth, windowHeight);
   background(255);
 
   stroke(0, 0, 0);
@@ -16,9 +31,10 @@ function setup() {
   noFill();
   rect(0, 0, windowWidth, windowHeight);
 
-  c = (windowHeight / 3);
   r = (windowWidth / 3);
+  c = (windowHeight / 3);
 }
+
 
 let imgX;
 let imgO;
@@ -28,22 +44,8 @@ function preload() {
   imgO = loadImage('o.png');
 }
 
-
-//turn = 0 : X          // turn = 1 : O
-let turn = 0;
-let move = 0;
-let playerWon = false;
-
-//each sub array is a column
-let bins = [
-  [2, 3, 4],
-  [5, 6, 7],
-  [8, 9, 10]
-]; //instantiate as non repeating numbers--a bit hard codey but its just tic tac toe
-
-function mousePressed() {
-  //prevent clicking after game is over
-  if (turn >= 9 || playerWon) {
+function mouseClicked() {
+  if (movesPlayed >= 9 || playerWon) {
     return;
   }
 
@@ -54,59 +56,85 @@ function mousePressed() {
   let col = Math.floor((y * 3) / windowHeight);
 
   //if bin already full abort
-  if (bins[row][col] === 1 || bins[row][col] === 0) {
+  if (bins[row][col] === AI_PLAYER || bins[row][col] === HUMAN_PLAYER) {
     return;
   }
+  bins[row][col] = HUMAN_PLAYER;
+  image(imgX, r * row, c * col, windowWidth / 3, windowHeight / 3);
 
-
-  bins[row][col] = turn;
-  if (turn === 0) {
-    image(imgO, r * row, c * col, windowWidth / 3, windowHeight / 3);
-    turn = 1;
-  } else {
-    image(imgX, r * row, c * col, windowWidth / 3, windowHeight / 3);
-    turn = 0;
-  }
-
-  move = move + 1;
-  playerWon = checkWin(bins);
+  movesPlayed = movesPlayed + 1;
+  playerWon = checkWin(bins, movesPlayed);
 
   if (playerWon) {
     console.log("Game Over");
     winMessage(turn);
     return;
   }
-  if (move === 9 && playerWon === false) {
+  if (movesPlayed === 9 && playerWon === false) {
     console.log("Draw");
     drawMessage();
     return;
   }
+
+  turn = AI_PLAYER;
+  let aiMove = bestMove();
+
+  bins[aiMove[0]][aiMove[1]] = AI_PLAYER; //AI plays the best move it found
+  image(imgO, r * aiMove[1], c * aiMove[0], windowWidth / 3, windowHeight / 3);
+  movesPlayed = movesPlayed + 1;
+  gameOutcome = checkWin(bins);
+
+  if(gameOutcome !== null) {
+    console.log("Game Over");
+    winMessage(gameOutcome);
+    return;
+  }
+  if (movesPlayed === 9 || playerWon === 2) {
+    console.log("Draw");
+    drawMessage();
+    return;
+  }
+
+  turn = HUMAN_PLAYER;
+
 }
 
 //definitely not the fastest way but idc about that for this project
-function checkWin(bins) {
+function checkWin(board) {
   //check cols
   for (let i = 0; i < 3; i++) {
-    if (bins[i][0] === bins[i][1] && bins[i][0] === bins[i][2]) {
-      return true;
+    if (board[i][0] === board[i][1] && board[i][0] === board[i][2]) {
+      return board[i][0];
     }
   }
   //check rows
   for (let i = 0; i < 3; i++) {
-    if (bins[0][i] === bins[1][i] && bins[0][i] === bins[2][i]) {
-      return true;
+    if (board[0][i] === board[1][i] && board[0][i] === board[2][i]) {
+      return board[0][i];
     }
   }
   //check diag
-  if (bins[0][0] === bins[1][1] && bins[0][0] === bins[2][2]) {
-    return true;
+  if (board[0][0] === board[1][1] && board[0][0] === board[2][2]) {
+    return board[0][0];
   }
   //check anti-diag
-  if (bins[2][0] === bins[1][1] && bins[2][0] === bins[0][2]) {
-    return true;
+  if (board[2][0] === board[1][1] && board[2][0] === board[0][2]) {
+    return bins[2][0];
   }
 
-  return false;
+  let movesPlayed = 0;
+  for(let i = 0; i < 3 ; i ++){
+    for(let j = 0; j < 3; j++){
+        if(board[i][j] === AI_PLAYER || board[i][j] === HUMAN_PLAYER){
+          movesPlayed += 1;
+        }
+    }
+  }
+  if(movesPlayed === 9){
+    return 2; // set as two because score[2] is for a draw
+  }
+
+  return null;
 }
 
 
@@ -114,11 +142,11 @@ function winMessage(turn) {
   fill('rgba(0,255,0, 0.25)')
   rect(0, 0, windowWidth, windowHeight);
   textSize(28);
-  if (turn === 0) {
-    text("The X's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight); //above X's are 1 but the turn flips before this gets called so its backwards
+  if (turn === AI_PLAYER) {
+    text("The O's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight); //above X's are 1 but the turn flips before this gets called so its backwards
     setTimeout(resetCanvas, 1200);
   } else {
-    text("The O's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
+    text("The X's Won. Resetting canvas.", windowWidth / 4, windowHeight / 2, windowWidth / 2, windowHeight);
     setTimeout(resetCanvas, 1200);
   }
 }
@@ -141,8 +169,8 @@ function resetCanvas() {
     [5, 6, 7],
     [8, 9, 10]
   ];
-  turn = 0;
-  move = 0;
+  turn = HUMAN_PLAYER;
+  movesPlayed = 0;
   playerWon = false;
   setup();
 }

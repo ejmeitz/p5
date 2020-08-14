@@ -1,50 +1,62 @@
 let maxDepth = 3;
+let scores = [10, -10, 0]; //[AI_PLAYER, HUMAN_PLAYER, TIE]
 
-function checkForTerminalState(){
-
-
-
-}
-
-function getPossibleMoves() {
-
-
-
+function getPossibleMoves(board) {
+    let possibleMoves = [];
+    for(let i = 0; i < 3; i++){  //hard coded for 3x3 board
+      for (let j = 0; j < 3; j++){
+        if(board[i][j] !== AI_PLAYER || board[i][j] !== HUMAN_PLAYER){
+          let move = [i,j];
+          possibleMoves.push(move);
+        }
+      }
+    }
+    return possibleMoves;
 }
 
 function bestMove() {
   let bestScore = -Infinity;
   let nextMove;
 
-  let avaiableMoves = getPossibleMoves(board);
 
-  avaiableMoves.forEach(move => {
-    let score = minimax(grid, 0, turn)
-    if(score > bestScore){
-      bestScore = score;
-      nextMove = move;
+  for(let i = 0; i < 3; i++){  //hard coded for 3x3 board
+    for (let j = 0; j < 3; j++){
+      if(bins[i][j] !== AI_PLAYER || bins[i][j] !== HUMAN_PLAYER){
+
+        let hold = bins[i][j];
+        bins[i][j] = AI_PLAYER;
+        let score = minimax(bins, 0, true); //update board to try that move 
+        bins[i][j] = hold; //then put it back ...idk how else to do this javascript really doesn't like making copies
+        if(score > bestScore){
+          bestScore = score;
+          nextMove = [i,j];
+        }
+
+      }
     }
-  });
+  }
+  console.log("Next Move: " + nextMove);
+  return nextMove;
 }
 
-function miniMax(board, depth, turn){
-  let gameIsOver = checkWin(grid);
-
-  if(gameIsOver){
-      return; .....//TO DO
+function minimax(board, depth, isMaximizing){
+  let outcome = checkWin(board); //rn this only returns a bool not who won 
+  if(outcome !==null){ //null indicates no win--doesn't necessarily mean a draw
+      return scores[outcome];
   }
   if(depth === maxDepth){
-    return //TO DO;
+      return evaluate(board);
   }
 
-    let avaiableMoves = getPossibleMoves(board);
-  if(turn === AI_TURN){ //maximizing player
+  let possibleMoves = getPossibleMoves(board);
+  if(isMaximizing){ //AI Player
     let bestScore = -Infinity;
 
-    avaiableMoves.forEach(move => {
-        tempBoard = board;
-        tempBoard[move.x][move.y] = AI_VARIABLE; //NEED TO PICK IF AI IS X or O
-        let score =  minimax(tempBoard,depth + 1, HUMAN_TURN)
+    possibleMoves.forEach(move => {
+        let hold = board[move[0]][move[1]]; //could also assign a copy
+        board[move[0]][move[1]] = AI_PLAYER; //update the temp board
+        let score =  minimax(board, depth + 1, false);
+        board[move[0]][move[1]] = hold;
         if(score > bestScore){
           bestScore = score;
         }
@@ -53,10 +65,11 @@ function miniMax(board, depth, turn){
   } else {  //minimizing player
     let bestScore = Infinity;
 
-    avaiableMoves.forEach(move => {
-        tempBoard = board;
-        tempBoard[move.x][move.y] = HUMAN_VARIABLE; //NEED TO PICK IF AI IS X or O
-        let score =  minimax(tempBoard,depth + 1, AI_TURN)
+    possibleMoves.forEach(move => {
+        let hold = board[move[0]][move[1]];
+        board[move[0]][move[1]] = HUMAN_PLAYER; 
+        let score =  minimax(board, depth + 1, true);
+        board[move[0]][move[1]] = hold;
         if(score < bestScore){
           bestScore = score;
         }
@@ -64,4 +77,20 @@ function miniMax(board, depth, turn){
     return bestScore;
   }
 
+}
+
+function evaluate(board) {
+	let score = 0;
+  let outcome = checkWin(board);
+
+	if (outcome === AI_PLAYER) { //ai wins
+		score = 10;
+	}
+	else if (outcome === HUMAN_PLAYER) { //human wins
+		score = -10;
+	} else { //draw
+		score = 0;
+	}
+
+	return score;
 }
