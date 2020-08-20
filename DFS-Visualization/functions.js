@@ -65,7 +65,6 @@ function createRandomConnectivity(nodes, maxConnections){
     });
   }
 
-  console.log(nodes);
 }
 
 function createRandomGrid(){
@@ -92,17 +91,13 @@ function createRandomGrid(){
                          legal = true;
                        }
                    }
-
-
-
-
                 } else {
                   break;
                 }
             }
 
-            let temp = new Node(x1, y1, i);
-           nodes.push(temp);
+           
+           nodes.push(new Node(x1, y1, i));
 
     }
     return nodes;
@@ -142,4 +137,13 @@ function checkLineThruCircle(firstNode, secondNode, inBetweenNode){
     return true;
   }
   return false;
+}
+
+//pick alg that works well for small n
+function sortSet(){
+
+
+
+
+
 }
