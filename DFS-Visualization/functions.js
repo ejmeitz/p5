@@ -69,8 +69,6 @@ function createRandomConnectivity(nodes, maxConnections){
 
 function createRandomGrid(){
 
-    let nodes = [];
-
     for(let i = 0; i < numNodes; i++){
             let x1 ;
             let y1;
@@ -96,7 +94,7 @@ function createRandomGrid(){
                 }
             }
 
-           
+
            nodes.push(new Node(x1, y1, i));
 
     }
