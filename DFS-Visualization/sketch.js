@@ -3,6 +3,7 @@ let d = 30;
 let visitedNodes = [];
 let discoveryOrder = [];
 let nodes = [];
+let animated = []; //most of these global variables are just so window resizing is supported
 
 let previousWidth;
 let previousHeight;
@@ -20,6 +21,7 @@ class Node {
 let buttonHeight = 30;
 let buttonWidth = 100;
 let button;
+let discoveryString = "";
 
 function setup() {
   createCanvas(windowWidth,windowHeight);
@@ -40,6 +42,8 @@ function drawNextGraph() {
   clear();
   visitedNodes = [];
   nodes = [];
+  animated = [];
+  discoveryString = "";
 
   discoveryOrder = generateGraph(); //create new graph
 
@@ -47,7 +51,9 @@ function drawNextGraph() {
   noFill();
   stroke(255,0,0);
   strokeWeight(3);
- circle(discoveryOrder[0].x , discoveryOrder[0].y , d);
+  circle(discoveryOrder[0].x , discoveryOrder[0].y , d);
+  animated[0] = discoveryOrder[0];
+  discoveryString += discoveryOrder[0].value + " ";
   for(let i = 1; i < numNodes; i++){
      setTimeout(animatePath, delay * i, discoveryOrder[i], discoveryOrder[i-1], i);
   }
@@ -56,7 +62,7 @@ function drawNextGraph() {
 
 function animatePath(node, lastNode, index){
   noFill();
-
+  strokeWeight(3);
   //add color to current node
   stroke(255,0,0);
   circle(node.x , node.y , d);
@@ -64,6 +70,17 @@ function animatePath(node, lastNode, index){
   //change color of previous node
   stroke(0,255,0);
   circle(lastNode.x , lastNode.y , d);
+  animated[index] = node;
+
+  discoveryString += node.value + " ";
+  textSize(14);
+  textAlign(LEFT, TOP);
+  fill(0);
+  strokeWeight(0.5);
+  stroke(0);
+
+  text("Discovery Order: " + discoveryString, 10, 10);
+
 
   if(index === numNodes-1){
       button.removeAttribute('disabled');
@@ -104,28 +121,26 @@ function generateGraph(){
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 
-  let diffX = previousWidth - windowWidth;
-  let percentChangeX = diffX/previousWidth;
-  let diffY = previousHeight - windowHeight;
-  let percentChangeY = diffY/previousHeight;
-
+  let diffX = windowWidth - previousWidth;
+  let percentChangeX = diffX / previousWidth;
+  let diffY = windowHeight - previousHeight;
+  let percentChangeY = diffY / previousHeight;
   previousWidth = windowWidth;
   previousHeight = windowHeight;
 
   nodes.forEach( node => {
-    node.x * (1 + percentChangeX);
-    node.y * (1 + percentChangeY);
+    node.x = node.x * (1 + percentChangeX);
+    node.y = node.y * (1 + percentChangeY);
   });
 
-  stroke(0);
   strokeWeight(3);
+  stroke(0);
   for(let i = 0; i < nodes.length; i++){
     nodes[i].neighbors.forEach(w => {
         line(nodes[w].x,nodes[w].y,nodes[i].x, nodes[i].y);
-        console.log("hi")
     });
   }
-    console.log("bye")
+
   for(let i = 0; i < nodes.length; i++){
       let x = nodes[i].x;
       let y = nodes[i].y;
@@ -138,6 +153,13 @@ function windowResized() {
       strokeWeight(1);
       text(i, x, y)
   }
+
+  stroke(0,255,0);
+  strokeWeight(3);
+  noFill();
+  animated.forEach(node => {
+    circle(node.x,node.y,d);
+  })
 
   button.remove();
   button = createButton('New Graph');
