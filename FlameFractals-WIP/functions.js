@@ -1,12 +1,13 @@
 class Transform{
-    constructor(coefficients){
+    constructor(coefficients,c){
         this.coeffs = coefficients;
+        this.color = c;
     }
 
     apply(x,y){
-        let x = this.coeffs[0]*x + this.coeffs[1]*y + this.coeffs[2];
-        let y = this.coeffs[3]*x + this.coeffs[4]*y + this.coeffs[5];
-        return new Array(x,y);
+        let newX = this.coeffs[0]*x + this.coeffs[1]*y + this.coeffs[2];
+        let newY = this.coeffs[3]*x + this.coeffs[4]*y + this.coeffs[5];
+        return new Array(newX,newY);
     }
 
     colorMapping(x,y){ //in the real one this map is function specific i.e. its a parameter in the constructor, but this is simpler
@@ -19,15 +20,23 @@ class Transform{
 
 
 class FunctionSet{
-    constructor(functions){
+    constructor(functions, numFunctions){
         this.funcs = functions;
+        this.count = numFunctions;
     }
 }
 
-//P5 has built in affine transformations to use
-// class PostTransform extends Transform{
-//     constructor(coefficients) {
-//         super(coefficients); // call the super class constructor and pass in the name parameter
-//       }
+//can be chosen from a set and applied after the variation -- kinda just another step to get away from the original image
+class PostTransform extends Transform{
+    constructor(coefficients,c) {
+        super(coefficients,c); 
+      }
 
-// }
+}
+
+//applied to every iteration -- not randomly chosen from a set like a normal transform
+class FinalTransform extends Transform{
+    constructor(coefficients,c) {
+        super(coefficients,c); 
+      }
+}

@@ -1,11 +1,3 @@
-class Variation{
-    constructor(t = 0, parameters = [0,0,0,0]){ //params are x,y,r,0 ... there are more like phi and omega
-        this.type = t;  //e.g. linear --> F_i where i = type;
-        this.params = parameters;
-    }
-}
-
-
 function linear(x,y){ 
     return new Array(x,y);
 }
@@ -43,7 +35,7 @@ function heart(x,y){
     return new Array(newX, newY);
 }
 
-function disc(x,y){
+function disk(x,y){
     let r = Math.sqrt(x*x + y*y);
     let theta = Math.atan(x / y);
     let k = theta/Math.PI;
