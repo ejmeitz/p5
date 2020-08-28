@@ -3,13 +3,13 @@ function linear(x,y){
 }
 
 function sinusoidal(x,y){  
- return new Array(Math.sin(x),Math.cos(y));
+ return new Array(Math.sin(x),Math.sin(y));
 }
 
 function spherical(x,y){  
     let r = Math.sqrt(x*x + y*y);
-    let newX = (x / (r**2));
-    let newY = (y / (r**2));
+    let newX = (x / (r*r));
+    let newY = (y / (r*r));
     return new Array(newX, newY);
 }
 

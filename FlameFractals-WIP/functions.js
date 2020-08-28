@@ -28,8 +28,8 @@ class FunctionSet{
 
 //can be chosen from a set and applied after the variation -- kinda just another step to get away from the original image
 class PostTransform extends Transform{
-    constructor(coefficients,c) {
-        super(coefficients,c); 
+    constructor(coefficients) {
+        super(coefficients); 
       }
 
 }
