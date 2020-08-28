@@ -20,9 +20,9 @@ class Transform{
 
 
 class FunctionSet{
-    constructor(functions, numFunctions){
+    constructor(functions){
         this.funcs = functions;
-        this.count = numFunctions;
+        this.count = functions.length;
     }
 }
 
@@ -39,4 +39,13 @@ class FinalTransform extends Transform{
     constructor(coefficients,c) {
         super(coefficients,c); 
       }
+}
+
+class FlameFractal {
+    constructor(fSet,pTransform,fTransform,vars){
+        this.functionSet = fSet;
+        this.postTransform = pTransform;
+        this.finalTransform = fTransform;
+        this.variants = vars;
+    }
 }
