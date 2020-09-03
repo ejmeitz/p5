@@ -1,13 +1,12 @@
 // Based on Scott Draves paper : https://flam3.com/flame_draves.pdf
 
-let numPoints = 1000000; //paper uses 9.26 million
+let numPoints = 9000000; //paper uses 9.26 million
 let gamma = 2.2;
 
-
-let w = 1200;
-let h = 1200;
-
 let superSamplingFactor = 1;
+
+let w = 900 * superSamplingFactor;
+let h = 900 * superSamplingFactor;  //i always want the final to be 900 x 900 regardless of the super sampling
 
 let super_w = w / superSamplingFactor;
 let super_h = h / superSamplingFactor;
@@ -59,12 +58,12 @@ function draw() {
     x = tempSumX;
     y = tempSumY;
 
-    // APPLY POST TRANSFORMS
+    //APPLY POST TRANSFORMS
     let postTransform = random(currentFractal.postTransforms.funcs);
     [x, y] = postTransform.apply(x,y);        
 
     // APPLY FINAL TRANSFORM 
-    let F0 = new FinalTransform([-x,0.3*y,0.1,-y,0.1,x]);  //final transofmrs can be as complex as wanted -- no convergence criteria
+    let F0 = new FinalTransform([0.1,x*x,0,y*y,0.3,0]);  //final transofmrs can be as complex as wanted -- no convergence criteria
     let [finalX, finalY] = F0.apply(x,y)
 
     let scaledX = Math.floor(finalX * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
@@ -89,6 +88,8 @@ function draw() {
     }
   }
 
+  applyColorMap();
+
   //adjust gamma before super sampling
   for (i = 0; i < h; i++){
     for(j = 0; j < w; j++){
@@ -103,22 +104,16 @@ function draw() {
        _pixels[channels*(i*w + j)]     *=  k;
     }
   }
-  applyColorMap();
+
   if(superSamplingFactor === 1){
     for (i = 0; i < h; i++){
       for(j = 0; j < w; j++){
-        let alpha = _pixels[channels*(i*w + j) + 3];
-        let k = 0;
-        if(alpha > 0){
-          k = Math.pow((Math.log(alpha) /  Math.log(max) ), 1 / gamma);
-        }
-
-        let r =  k * Math.floor(_pixels[channels*(i*w + j) + 2]);   
-        let g =  k * Math.floor(_pixels[channels*(i*w + j) + 1]);
-        let b =  k * Math.floor(_pixels[channels*(i*w + j)]);
+        let r =  Math.floor(_pixels[channels*(i*w + j) + 2]);   
+        let g =   Math.floor(_pixels[channels*(i*w + j) + 1]);
+        let b =   Math.floor(_pixels[channels*(i*w + j)]);
       stroke(r,g,b);
-        //  rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
-      // rotate(PI / 6); 
+         // rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
+       //rotate(PI / 6); 
         point(j - (w/2), i - (h/2)); //translate back to actual coordinates
       } 
     }
@@ -156,7 +151,7 @@ function generateWeights(numVariations){
   return w;
 }
 
-//assumes weights are 0-1 and add to 1
+//THIS IS PROBABLY WRONG -- needs weights to be positive integer numbers
 function chooseWeighted(items, w) {
 
   let weightedArray = [];

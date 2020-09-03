@@ -16,22 +16,22 @@
 
 
 
-  let T0 = new Transform([0,0.0392,-0.4,0.222,0.1,.9999],  1, [linear]);
-  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.7, [cross,cross]);
-  let T2 = new Transform([0.5543,0.5433,0,0,0.545,0.4345],       0.5, [cross,cross]);
-  let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [cross]);
-  let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],             0.1, [cross]);
+  let T0 = new Transform([-1,0,0,0,1,0],                        0.9, [eyefish]);
+  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.7, [eyefish]);
+  let T2 = new Transform([1,0.5,0,0,1,0],                       0.5, [eyefish]);
+  let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [eyefish]);
+  let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],            0.1, [eyefish]);
 
-  let Sierpinski = new FunctionSet(new Array(T0,T1,T2,T3,T4), [0.6,0.05,0.05,0.2,0.1]);
+  let Sierpinski = new FunctionSet(new Array(T0,T1,T2,T3,T4), [5,1,1,1,2]);
 
 
-  let P0 = new Transform([0.2,0.8,-0.4,0.01,0.6,1]);
+  let P0 = new Transform([-1,0,0,0,1,0]);
   let P1 = new Transform([0.2,0.8,-0.6,-0.1,0.6,0.8]);
   let P2 = new Transform([0.3,0.8,0.7,0.2,0.6,-0.25]);
   let P3 = new Transform([0,0.8,0.3,0.4,0.6,0]);
   let P4 = new Transform([0.1,0.8,0.3,2,0.6,-0.4]);
 
-  let post = new FunctionSet(new Array(P0,P1,P2,P3,P4) , [0.2,0.2,0.2,0.2,0.2]);
+  let post = new FunctionSet(new Array(P0,P1,P2,P3,P4) , [5,2,1,2,1]);
 
   let testFractal = new FlameFractal(Sierpinski, post); 
 
