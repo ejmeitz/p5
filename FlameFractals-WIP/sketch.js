@@ -44,30 +44,38 @@ function draw() {
     [x,y] = transform.apply(x,y); 
 
     //calculate V_j for whichever variations are chosen
-    let tempSumX = 0; 
-    let tempSumY = 0;
+    let tempX = 0; 
+    let tempY = 0;
 
     // calculate weights for N variations and make sure they add to 1
     weights = generateWeights(transform.variants.length);
       for(let k = 0; k < transform.variants.length; k++){
       let temp = transform.variants[k](x,y,weights[k]);
-      tempSumX += temp[0];
-      tempSumY += temp[1];
+      tempX += temp[0];
+      tempY += temp[1];
     }
 
-    x = tempSumX;
-    y = tempSumY;
+    x = tempX;
+    y = tempY;
 
     //APPLY POST TRANSFORMS
     let postTransform = random(currentFractal.postTransforms.funcs);
     [x, y] = postTransform.apply(x,y);        
 
     // APPLY FINAL TRANSFORM 
-    let F0 = new FinalTransform([0.1,x*x,0,y*y,0.3,0]);  //final transofmrs can be as complex as wanted -- no convergence criteria
-    let [finalX, finalY] = F0.apply(x,y)
+    let scaledX;
+    let scaledY;
+    if(currentFractal.useFinal){
+      let F0 = new FinalTransform([0.3,x*x,0,y*y,0.3,0]);  //final transofmrs can be as complex as wanted -- no convergence criteria
+      [scaledX, scaledY] = F0.apply(x,y);
+      scaledX = Math.floor(scaledX * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
+      scaledY = Math.floor(scaledY * h * 0.5 + (h/2));
+    }  else {
+      scaledX = Math.floor(x * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
+      scaledY = Math.floor(y * h * 0.5 + (h/2));
+    }
 
-    let scaledX = Math.floor(finalX * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
-    let scaledY = Math.floor(finalY * h * 0.5 + (h/2));
+    
 
     if(j >= 20 && scaledX < w && scaledX > 0 && scaledY < h && scaledY > 0){ 
      _pixels[channels*(scaledY * w + scaledX)]     = (0.5 * (c + transform.color)); //color is taken from 0-1 and mapped to a color bar

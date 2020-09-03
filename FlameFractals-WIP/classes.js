@@ -36,9 +36,9 @@ class FinalTransform extends Transform{
 }
 
 class FlameFractal {
-    constructor(fSet,pTransformSet,fTransform = 0){
+    constructor(fSet,pTransformSet,final = false){
         this.functionSet = fSet;
         this.postTransforms = pTransformSet;
-        this.finalTransform = fTransform;
+        this.useFinal = final;
     }
 }

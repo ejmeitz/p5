@@ -10,19 +10,17 @@
 
   // let post = new FunctionSet(new Array(P0) , [1]);
 
-  // let F0 = new FinalTransform([0.25,1,1.6,0.5,0.5,0]);  //use coefficients in -1 -> 1 to converge--not sure if thats the only ones but using 3 and 4 definitely diverge
-
-  // let testFractal = new FlameFractal(Sierpinski,post,F0); 
+  // let testFractal = new FlameFractal(Sierpinski,post); 
 
 
 
-  let T0 = new Transform([-1,0,0,0,1,0],                        0.9, [eyefish]);
-  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.7, [eyefish]);
-  let T2 = new Transform([1,0.5,0,0,1,0],                       0.5, [eyefish]);
+  let T0 = new Transform([-1,0,0,0,1,0],                        0.8, [disk]);
+  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.2, [disk]);
+  let T2 = new Transform([1,0.5,0,0,1,0],                       0.5, [swirl]);
   let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [eyefish]);
   let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],            0.1, [eyefish]);
 
-  let Sierpinski = new FunctionSet(new Array(T0,T1,T2,T3,T4), [5,1,1,1,2]);
+  let Sierpinski = new FunctionSet(new Array(T0,T2,T1), [5,4,1]);
 
 
   let P0 = new Transform([-1,0,0,0,1,0]);
@@ -31,9 +29,9 @@
   let P3 = new Transform([0,0.8,0.3,0.4,0.6,0]);
   let P4 = new Transform([0.1,0.8,0.3,2,0.6,-0.4]);
 
-  let post = new FunctionSet(new Array(P0,P1,P2,P3,P4) , [5,2,1,2,1]);
+  let post = new FunctionSet(new Array(P0,P1,P2) , [5,3,2]);
 
-  let testFractal = new FlameFractal(Sierpinski, post); 
+  let testFractal = new FlameFractal(Sierpinski, post, false); 
 
 
   // let T0 = new Transform([0.5,0,0,0,0.5,0],[191,57,0]);
