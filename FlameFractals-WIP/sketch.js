@@ -1,14 +1,19 @@
 // Based on Scott Draves paper : https://flam3.com/flame_draves.pdf
 
 let numPoints = 5000000; //paper uses 9.26 million
+let gamma = 1.4;
 
-let w = 1000;
-let h = 1000;
+
+let w = 1200;
+let h = 1200;
 
 let channels = 4;
-let _pixels = new Array(channels*w*h).fill(0); //array for every pixel with x channels of color info
+let _pixels = new Array(channels * w * h).fill(0); //array for every pixel with x channels of color info
 
-let all_variations = [linear,sinusoidal,spherical,swirl,horseshoe,disk,heart,handkerchief,polar];
+let all_variations =
+          [linear, sinusoidal, spherical, swirl, horseshoe, 
+          disk, heart, handkerchief, polar, bent, ex, diamond,
+          hyperbolic, diamond, spiral];
 let currentFractal = testFractal;
 
 
@@ -26,54 +31,49 @@ function draw() {
   let x = random(-1, 1);
   let y = random(-1, 1);
 
-  let init_c = Math.floor(255*random(0,1));
-  let colors = [init_c,init_c,init_c];
+  let c = random(0,1);
 
   for(let j = 0; j < numPoints; j++){
     
-    let transform = random(currentFractal.functionSet.funcs);
+    let weights = currentFractal.functionSet.weights;
+    let transform = chooseWeighted(currentFractal.functionSet.funcs, weights);
 
+   // let transform = random(currentFractal.functionSet.funcs);
     //apply initial transform chosen randomly from a set of transforms
-    let newPoints = transform.apply(x,y); 
-    x = newPoints[0];
-    y = newPoints[1];
+    [x,y] = transform.apply(x,y); 
 
     //calculate V_j for whichever variations are chosen
-    let tempSumX = 0; //need hold variables because each variation needs the initial value of x 
+    let tempSumX = 0; 
     let tempSumY = 0;
-    for(let k = 0; k < currentFractal.variants.length; k++){
-      let temp = currentFractal.variants[k](x,y);
+
+    // calculate weights for N variations and make sure they add to 1
+    weights = generateWeights(transform.variants.length);
+      for(let k = 0; k < transform.variants.length; k++){
+      let temp = transform.variants[k](x,y,weights[k]);
       tempSumX += temp[0];
       tempSumY += temp[1];
     }
+
     x = tempSumX;
     y = tempSumY;
 
+    // APPLY POST TRANSFORMS
+    let postTransform = random(currentFractal.postTransforms.funcs);
+    [x, y] = postTransform.apply(x,y);        
 
-    // APPLY POST TRANSFORMS HERE on tempX tempY       //rn this is ugly af
-    let postTrans = currentFractal.postTransform.apply(x,y)
-    x = postTrans[0];
-    y = postTrans[1];         
-  // APPLY FINAL TRANSFORM HERE on output of post transform
+    // APPLY FINAL TRANSFORM 
+    let F0 = new FinalTransform([-x,0.3*y,0.1,-y,0.1,x]);  //final transofmrs can be as complex as wanted -- no convergence criteria
+    let [finalX, finalY] = F0.apply(x,y)
 
-    let finalTrans = currentFractal.finalTransform.apply(x,y)
-    let finalX = finalTrans[0];
-    let finalY = finalTrans[1];
-    
     let scaledX = Math.floor(finalX * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
     let scaledY = Math.floor(finalY* h * 0.5 + (h/2));
 
-    
     if(j >= 20 && scaledX < w && scaledX > 0 && scaledY < h && scaledY > 0){ 
-        _pixels[channels*(scaledY * w + scaledX)]     = Math.floor(0.5 * (colors[0] + transform.color[0]));
-        _pixels[channels*(scaledY * w + scaledX) + 1] = Math.floor(0.5 * (colors[1] + transform.color[1]));    //r-g-b channels depend on function chosen and previous color
-        _pixels[channels*(scaledY * w + scaledX) + 2] = Math.floor(0.5 * (colors[2] + transform.color[2]));  
-        _pixels[channels*(scaledY * w + scaledX) + 3] += 1; //alpha channel is dependent on frequency of point
+     _pixels[channels*(scaledY * w + scaledX)]     = (0.5 * (c + transform.color)); //color is taken from 0-1 and mapped to a color bar
+     _pixels[channels*(scaledY * w + scaledX) + 3] += 1;  //density is tracked in alpha channel
     }
 
-      colors[0] = Math.floor(0.5 * (colors[0] + transform.color[0]));
-      colors[1] = Math.floor(0.5 * (colors[1] + transform.color[1]));
-      colors[2] = Math.floor(0.5 * (colors[2] + transform.color[2]));
+    c = 0.5 * (c + transform.color);
   }
 
   //loop alpha values to find biggest frequency --better than math.max cause we just want the alpha values
@@ -87,78 +87,110 @@ function draw() {
     }
   }
 
-  // var histogram = new Array(max);
-  // for (i = 0; i <= max; i++) {
-  //   histogram[i] = 0
-  // }
-  // for (i = 0; i < h; i++){
-  //   for(j = 0; j < w; j++){
-  //     histogram[_pixels[channels*(i*w + j) + 3]]++
-  //   }
-  // }
-  // for (x = 0; x <= max; x++) {
-  //   index = histogram[x];
 
-  //   y1=int(map(index, 0, Math.max(...histogram), h, h-200));
-	// 	y2 = h
-  //   xPos = map(x,0,max,0, width-20)
-  //   line(xPos, y1, xPos, y2);
-  // }
-
-  let gamma = 1.4
+  applyColorMap()
   for (i = 0; i < h; i++){
     for(j = 0; j < w; j++){
       let alpha = _pixels[channels*(i*w + j) + 3];
-      let k = 1;
+      let k = 0;
       if(alpha > 0){
-        k = Math.log(alpha) /  alpha;
+        k = Math.pow((Math.log(alpha) /  Math.log(max) ), 1 / gamma);
       }
 
-      let r =  2 * k * _pixels[channels*(i*w + j)];   //add alpha information into image -- if the point was visited a lot k will be closer to 1 and other wise it will dim that pixel
-      let g =  2 * k * _pixels[channels*(i*w + j) + 1];
-      let b =  2 * k * _pixels[channels*(i*w + j) + 2];
+      let r =  k * Math.floor(_pixels[channels*(i*w + j) + 2]);   
+      let g =  k * Math.floor(_pixels[channels*(i*w + j) + 1]);
+      let b =  k * Math.floor(_pixels[channels*(i*w + j)]);
 
 
-      let brightness = (0.2126*r + 0.7152*g + 0.0722*b) / 255; //perceived brightness (0-1)
-      brightness = 255 * Math.pow(brightness, 1/gamma); //paper suggests gamma === 2.2
+     stroke(r,g,b);
 
-      if(brightness > 0){
-        r += brightness;
-        g += brightness; 
-        b += brightness;
-        constrain(r, 0, 255);
-        constrain(g, 0, 255);
-        constrain(b, 0, 255);
-      }
 
-      let c = color(Math.floor(r), Math.floor(g), Math.floor(b));
-      stroke(c);
-      // rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool af
-      //rotate(PI / 6); 
+      //  rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
+      rotate(PI / 6); 
+
+
+      // stroke(Math.floor(255*_pixels[channels*(i*w + j)]))
       point(j - (w/2), i - (h/2)); //translate back to actual coordinates
-      
     }
   }
 }
 
 
-//simple chaos-game to base flame fractal on
-function sierpinski(x,y,i){
-  if(i === 0){
-    return new Array(0.5*x , 0.5*y,[125,176,255]);  //thrid is color info--just a test
-  } else if (i === 1){
-    return new Array(0.5*(x+1) , 0.5*y,[30,190,255]);
-  } else {
-    return new Array(0.5*x , 0.5*(y+1),[125,30,255]);
+
+function generateWeights(numVariations){
+  let w = new Array(numVariations);
+  let sum = 0;
+  for(let i = 0; i < numVariations; i++){
+    w[i] = Math.random();
+    sum += w[i];
   }
-}
-function transformation2(x,y,i){  //things like x*y break the form of the function
-  if(i === 0){
-    return new Array(x + y + 1 , y, [125,176,255]);  //thrid is color info--just a test
-  } else if (i === 1){
-    return new Array(2 , 0.5*y,[255,190,255]);
-  } else {
-    return new Array(0.5*x , 0.5*(y+1),[125,30,255]);
+
+  for(let i = 0; i < numVariations; i++){
+    w[i] /= sum;
   }
+
+  return w;
 }
 
+//assumes weights are 0-1 and add to 1
+function chooseWeighted(items, w) {
+
+  let weightedArray = [];
+
+  for (let i = 0; i < items.length; i++) {
+    for (let j = 0; j < w[i]; j++){
+        weightedArray.push(i);
+    }
+  }
+
+  return items[weightedArray[Math.floor(Math.random() * weightedArray.length)]];
+}
+
+//takes a value between 0-1 and maps it to an rgb color gradient 
+function applyColorMap() {
+	let value = 0; //arbitrary starting value
+
+	for (let i = 0; i < h; i++) {
+		for (let j = 0; j < w; j++) {
+		
+      value = _pixels[channels * (i * w + j)];  
+			if (value >= 0.875) {
+				_pixels[(channels * (w * i + j))] = 0;   //b
+				_pixels[(channels * (w * i + j)) + 1] = 0;  //g
+        _pixels[(channels * (w * i + j)) + 2] = (255.0 * ((-4.0 * value) + 4.5));  //r
+				continue;
+			}
+			else if (value >= 0.625) {
+				_pixels[channels * (w * i + j)] = 0;
+				_pixels[(channels * (w * i + j)) + 1] = (255.0 * ((-4.0 * value) + 3.5));
+				_pixels[(channels * (w * i + j)) + 2] = 255;
+				continue;
+			}
+			else if (value >= 0.375) {
+				_pixels[channels * (w * i + j)] = (255.0 * ((-4.0 * value) + 2.5));
+				_pixels[(channels * (w * i + j)) + 1] = 255;
+        _pixels[(channels * (w * i + j)) + 2] = (255.0 * ((4.0 * value) - 1.5));
+				continue;
+			}
+			else if (value >= 0.125) {
+				_pixels[channels * (w * i + j)] = 255;
+				_pixels[(channels * (w * i + j)) + 1] = (255.0 * ((4.0 * value) - 0.5));
+				_pixels[(channels * (w * i + j)) + 2] = 0;
+				continue;
+			}
+			else if( value > 0) {
+				_pixels[channels * (w * i + j)] = (255.0 * ((4.0 * value) + 0.5));
+				_pixels[(channels * (w * i + j)) + 1] = 0;
+				_pixels[(channels * (w * i + j)) + 2] = 0;
+				continue;
+			} else {
+        _pixels[channels * (w * i + j)] = 0;
+				_pixels[(channels * (w * i + j)) + 1] = 0;
+        _pixels[(channels * (w * i + j)) + 2] = 0;
+        continue;
+      }
+
+		}
+	}
+	
+}

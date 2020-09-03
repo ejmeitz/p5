@@ -1,19 +1,39 @@
 
-  let T0 = new Transform([0.5,0,0,0,0.5,0],[0,100,255]);
-  let T1 = new Transform([0.5,0,0.5,0,0.5,0],[255,69,0]);
-  let T2 = new Transform([0.5,0,0,0,0.5,0.5],[255,140,0]);
+  // let T0 = new Transform([0.5,0,0,0,0.5,0], 0.8 , [heart]);
+  // let T1 = new Transform([0.5,0,0.5,0,0.5,0], 0.5 , [heart]);
+  // let T2 = new Transform([0.5,0,0,0,0.5,0.5], 0.3 , [heart]);
 
-  let Sierpinski = new FunctionSet(new Array(T0,T1,T2));
-
-
-  let P0 = new PostTransform([0.2,0.8,1,2,0.6,1]);
-
-  let F0 = new FinalTransform([0.25,1,1.6,0.5,0.5,0]);  //use coefficients in -1 -> 1 to converge--not sure if thats the only ones but using 3 and 4 definitely diverge
-
-  let testFractal = new FlameFractal(Sierpinski,P0,F0, [heart,swirl,disk,polar]); 
+  // let Sierpinski = new FunctionSet(new Array(T0,T1,T2),[0.33,0.33,0.331]);
 
 
+  // let P0 = new Transform([0.2,0.8,1,2,0.6,1]);
 
+  // let post = new FunctionSet(new Array(P0) , [1]);
+
+  // let F0 = new FinalTransform([0.25,1,1.6,0.5,0.5,0]);  //use coefficients in -1 -> 1 to converge--not sure if thats the only ones but using 3 and 4 definitely diverge
+
+  // let testFractal = new FlameFractal(Sierpinski,post,F0); 
+
+
+
+  let T0 = new Transform([.5432,0.0392,0.5432,0.222,0.1,.9999],  0.9, [spiral]);
+  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.7, [spiral,spiral]);
+  let T2 = new Transform([0.5543,0.5433,0,0,0.545,0.4345],       0.5, [swirl]);
+  let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [spiral]);
+  let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],             0.1, [swirl]);
+
+  let Sierpinski = new FunctionSet(new Array(T0,T1,T2,T3,T4), [0.4,0.25,0.05,0.2,0.1]);
+
+
+  let P0 = new Transform([0.2,0.8,-0.4,0.01,0.6,1]);
+  let P1 = new Transform([0.2,0.8,-0.6,-0.1,0.6,0.8]);
+  let P2 = new Transform([0.3,0.8,0.7,0.2,0.6,-0.25]);
+  let P3 = new Transform([0,0.8,0.3,0.4,0.6,0]);
+  let P4 = new Transform([0.1,0.8,0.3,2,0.6,-0.4]);
+
+  let post = new FunctionSet(new Array(P0,P1,P2,P3,P4) , [0.2,0.2,0.2,0.2,0.2]);
+
+  let testFractal = new FlameFractal(Sierpinski, post); 
 
 
   // let T0 = new Transform([0.5,0,0,0,0.5,0],[191,57,0]);
@@ -30,4 +50,4 @@
 
   // let F0 = new FinalTransform([0.25,1,1.6,0.5,0.5,0]);  //use coefficients in -1 -> 1 to converge--not sure if thats the only ones but using 3 and 4 definitely diverge
 
-  // let testFractal = new FlameFractal(Sierpinski,P0,F0, [swirl]); //check horseshoe
+  // let testFractal = new FlameFractal(Sierpinski,P0,F0); //check horseshoe
