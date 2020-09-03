@@ -1,3 +1,10 @@
+class Variation{
+    constructor(t){
+        this.type = t;
+    }
+}
+
+
 class Transform{
     constructor(coefficients, c = 0, vars = []){
         this.coeffs = coefficients;

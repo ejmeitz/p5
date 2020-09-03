@@ -1,24 +1,25 @@
 // Based on Scott Draves paper : https://flam3.com/flame_draves.pdf
 
-let numPoints = 5000000; //paper uses 9.26 million
-let gamma = 1.4;
+let numPoints = 1000000; //paper uses 9.26 million
+let gamma = 2.2;
 
 
 let w = 1200;
 let h = 1200;
 
+let superSamplingFactor = 1;
+
+let super_w = w / superSamplingFactor;
+let super_h = h / superSamplingFactor;
+
 let channels = 4;
 let _pixels = new Array(channels * w * h).fill(0); //array for every pixel with x channels of color info
 
-let all_variations =
-          [linear, sinusoidal, spherical, swirl, horseshoe, 
-          disk, heart, handkerchief, polar, bent, ex, diamond,
-          hyperbolic, diamond, spiral];
 let currentFractal = testFractal;
 
 
 function setup() {
-  createCanvas(w,h);
+  createCanvas(super_w, super_h);
 
   stroke(255);
   strokeWeight(1);
@@ -27,7 +28,8 @@ function setup() {
 
 function draw() {
   background(0);
-  translate(w/2, h/2);
+  translate(super_w / 2, super_h / 2);
+
   let x = random(-1, 1);
   let y = random(-1, 1);
 
@@ -66,7 +68,7 @@ function draw() {
     let [finalX, finalY] = F0.apply(x,y)
 
     let scaledX = Math.floor(finalX * w * 0.5 + (w/2)); // scale and translate to viewport size (scaling should be done after ALL transforms)
-    let scaledY = Math.floor(finalY* h * 0.5 + (h/2));
+    let scaledY = Math.floor(finalY * h * 0.5 + (h/2));
 
     if(j >= 20 && scaledX < w && scaledX > 0 && scaledY < h && scaledY > 0){ 
      _pixels[channels*(scaledY * w + scaledX)]     = (0.5 * (c + transform.color)); //color is taken from 0-1 and mapped to a color bar
@@ -87,31 +89,53 @@ function draw() {
     }
   }
 
-
-  applyColorMap()
+  //adjust gamma before super sampling
   for (i = 0; i < h; i++){
     for(j = 0; j < w; j++){
       let alpha = _pixels[channels*(i*w + j) + 3];
       let k = 0;
       if(alpha > 0){
-        k = Math.pow((Math.log(alpha) /  Math.log(max) ), 1 / gamma);
+        k = Math.pow((Math.log(alpha) /  Math.log(max)), 1 / gamma);
       }
 
-      let r =  k * Math.floor(_pixels[channels*(i*w + j) + 2]);   
-      let g =  k * Math.floor(_pixels[channels*(i*w + j) + 1]);
-      let b =  k * Math.floor(_pixels[channels*(i*w + j)]);
-
-
-     stroke(r,g,b);
-
-
-      //  rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
-      rotate(PI / 6); 
-
-
-      // stroke(Math.floor(255*_pixels[channels*(i*w + j)]))
-      point(j - (w/2), i - (h/2)); //translate back to actual coordinates
+       _pixels[channels*(i*w + j) + 2] *=  k ;   
+       _pixels[channels*(i*w + j) + 1] *=  k ;
+       _pixels[channels*(i*w + j)]     *=  k;
     }
+  }
+  applyColorMap();
+  if(superSamplingFactor === 1){
+    for (i = 0; i < h; i++){
+      for(j = 0; j < w; j++){
+        let alpha = _pixels[channels*(i*w + j) + 3];
+        let k = 0;
+        if(alpha > 0){
+          k = Math.pow((Math.log(alpha) /  Math.log(max) ), 1 / gamma);
+        }
+
+        let r =  k * Math.floor(_pixels[channels*(i*w + j) + 2]);   
+        let g =  k * Math.floor(_pixels[channels*(i*w + j) + 1]);
+        let b =  k * Math.floor(_pixels[channels*(i*w + j)]);
+      stroke(r,g,b);
+        //  rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
+      // rotate(PI / 6); 
+        point(j - (w/2), i - (h/2)); //translate back to actual coordinates
+      } 
+    }
+  } else {
+    let test = superSample(superSamplingFactor);
+
+    for (i = 0; i < super_h; i++){
+     for(j = 0; j < super_w; j++){
+       let r = Math.floor(test[channels*(i*super_w + j) + 2]);   
+       let g = Math.floor(test[channels*(i*super_w + j) + 1]);
+       let b = Math.floor(test[channels*(i*super_w + j)]);
+        stroke(r,g,b);
+       //  rotate(Math.PI / 1.61803398); //golden ratio as rotation  angle is cool 
+      // rotate(PI / 6); 
+       point(j - (super_w/2), i - (super_h/2)); //translate back to actual coordinates
+     }
+   }
   }
 }
 
@@ -193,4 +217,48 @@ function applyColorMap() {
 		}
 	}
 	
+}
+
+//CHANGE FROM BOX FILTER -- its crap
+function superSample(factor){ //if factor = 3 then we represent a 3x3 region in the original as a single pixel in the final
+  if(w % factor !== 0 || h % factor !== 0){
+    console.log("cannot super sample, dimensions are wrong");
+  }
+
+  let k = factor * factor;
+  let superSampledPixels = new Array(_pixels.length / k);
+
+  let new_h = h / factor;
+  let new_w = w / factor;
+
+  for(let i = 0; i < new_h; i++){ //loop through the new array
+    for(let j = 0; j < new_w; j++){
+
+      let averageRed = 0;
+      let averageBlue = 0;
+      let averageGreen = 0;
+      let averageAlpha = 0;
+
+      //sum up values from larger array
+      for(let m = 0; m < factor; m ++){ 
+        for(let n = 0; n < factor; n++){
+          averageBlue += _pixels[channels*((factor*i*w + m) + (factor*j+n))];
+          averageGreen += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 1];
+          averageRed += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 2];
+          averageAlpha += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 3];
+        }
+      }
+       averageRed /= k;
+       averageBlue /= k;
+       averageGreen /= k;
+       averageAlpha /= k;
+
+      superSampledPixels[channels*(i*new_w + j)]     = averageBlue   //b
+      superSampledPixels[channels*(i*new_w + j) + 1] = averageGreen //g
+      superSampledPixels[channels*(i*new_w + j) + 2] = averageRed //r
+      superSampledPixels[channels*(i*new_w + j) + 3] = averageAlpha //alpha
+    }
+  }
+
+  return superSampledPixels;
 }
