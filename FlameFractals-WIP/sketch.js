@@ -49,9 +49,25 @@ function draw() {
     // calculate weights for N variations and make sure they add to 1
     weights = generateWeights(transform.variants.length);
       for(let k = 0; k < transform.variants.length; k++){
-      let temp = transform.variants[k](x,y,weights[k]);
-      tempX += temp[0];
-      tempY += temp[1];
+        if(transform.variants[k].type === "parametric"){
+          let temp = transform.variants[k].apply(x,y,weights[k]);
+          tempX += temp[0];
+          tempY += temp[1];
+        } else if(transform.variants[k].type === "dependent"){
+          let a = transform.coeffs[0];
+          let b = transform.coeffs[1];
+          let c = transform.coeffs[2];
+          let d = transform.coeffs[3];
+          let e = transform.coeffs[4];
+          let f = transform.coeffs[5];
+          let temp = transform.variants[k].apply(x,y,a,b,c,d,e,f,weights[k]);
+          tempX += temp[0];
+          tempY += temp[1];
+        } else {
+          let temp = transform.variants[k].apply(x,y,weights[k],weights[k]);
+          tempX += temp[0];
+          tempY += temp[1];
+        }
     }
 
     x = tempX;
