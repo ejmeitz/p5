@@ -1,6 +1,6 @@
 // Based on Scott Draves paper : https://flam3.com/flame_draves.pdf
 
-let numPoints = 9000000; //paper uses 9.26 million
+let numPoints = 7000000; //paper uses 9.26 million
 let gamma = 2.2;
 
 let superSamplingFactor = 1;
@@ -15,7 +15,6 @@ let channels = 4;
 let _pixels = new Array(channels * w * h).fill(0); //array for every pixel with x channels of color info
 
 let currentFractal = testFractal;
-
 
 function setup() {
   createCanvas(super_w, super_h);

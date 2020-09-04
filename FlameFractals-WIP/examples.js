@@ -14,13 +14,13 @@
 
 
 
-  let T0 = new Transform([-1,0,0,0,1,0],                        0.8, [disk]);
-  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.2, [disk]);
-  let T2 = new Transform([1,0.5,0,0,1,0],                       0.5, [swirl]);
-  let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [eyefish]);
-  let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],            0.1, [eyefish]);
+  let T0 = new Transform([-1,0,0,0,1,0],                        0.8, [linear]);
+  let T1 = new Transform([.15,1,.5,.42,0.5234,0.76431],          0.2, [linear]);
+  let T2 = new Transform([1,0.5,0,0,1,0],                       0.5, [linear]);
+  let T3 = new Transform([0.5,-0.3,0,0.3,0.5,0],                 0.3, [linear]);
+  let T4 = new Transform([-0.6,0,0.8,-0.74,0.5,0.5],            0.1, [linear]);
 
-  let Sierpinski = new FunctionSet(new Array(T0,T2,T1), [5,4,1]);
+  let Sierpinski = new FunctionSet(new Array(T0,T3,T4,T1), [5,3,1,1]);
 
 
   let P0 = new Transform([-1,0,0,0,1,0]);

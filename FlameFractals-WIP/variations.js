@@ -1,3 +1,12 @@
+// let linear = {
+//     type : "parametric",
+       
+//     apply : function (x,y,weight) {
+//         return new Array(weight * x,weight * y);
+//     }
+// };
+
+
 function linear(x, y ,weight){ 
     return new Array(weight * x,weight * y);
 }
