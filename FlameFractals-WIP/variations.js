@@ -1,6 +1,6 @@
 let linear = {
     type : "parametric",
-       
+    blendingFactor : 1,
     apply : function (x,y,weight) {
         return new Array(weight * x,weight * y);
     }
@@ -9,7 +9,7 @@ let linear = {
 
 let sinusoidal = {
     type : "parametric",
-       
+    blendingFactor : 1,  
     apply : function (x,y,weight) {
         return new Array(weight * Math.sin(x),weight * Math.sin(y));
     }
@@ -17,7 +17,7 @@ let sinusoidal = {
 
 let spherical = {
     type : "parametric",
-       
+    blendingFactor : 1, 
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let newX = (x / (r*r));
@@ -28,7 +28,7 @@ let spherical = {
 
 let swirl = {
     type : "parametric",
-       
+    blendingFactor : 1,
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let r2 = r*r;
@@ -40,7 +40,7 @@ let swirl = {
 
 let horseshoe = {
     type : "parametric",
-       
+    blendingFactor : 1,   
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let newX = ((x-y)*(x+y)) / y;
@@ -51,7 +51,7 @@ let horseshoe = {
 
 let polar = {
     type : "parametric",
-       
+    blendingFactor : 1,   
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let theta = Math.atan(x / y);
@@ -62,7 +62,7 @@ let polar = {
 
 let heart = {
     type : "parametric",
-       
+    blendingFactor : 1,    
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let theta = Math.atan(x / y);
@@ -74,7 +74,7 @@ let heart = {
 
 let disk = {
     type : "parametric",
-       
+    blendingFactor : 1,   
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let theta = Math.atan(x / y);
@@ -86,7 +86,7 @@ let disk = {
 
 let handkerchief = {
     type : "parametric",
-       
+    blendingFactor : 1,   
     apply : function (x,y,weight) {
         let r = Math.sqrt(x*x + y*y);
         let theta = Math.atan(x / y);
@@ -99,7 +99,7 @@ let handkerchief = {
 
 let spiral = {
     type: "parametric",
-
+    blendingFactor : 1, 
     apply : function(x,y,weight){
         let r = Math.sqrt(x*x + y*y);
         let theta = Math.atan(x / y);
