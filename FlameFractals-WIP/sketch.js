@@ -219,19 +219,19 @@ function chooseWeighted(items, w) {
 //CHANGE FROM BOX FILTER -- its crap
 function superSample(factor){ //if factor = 3 then we represent a 3x3 region in the original as a single pixel in the final
 
-  let filter3x3 = [   
+  let filter = [   
     [0,1,0],
     [1,4,1],
     [0,1,0]
   ];
 
-  let filter5x5 = [
-    [0.5, 1.5, 1.5, 1.5, 0.5],
-    [1.5, 2.5, 3.0, 2.5, 1.5],
-    [1.5, 3.0, 5.0, 3.0, 1.5],
-    [1.5, 2.5, 3.0, 2.5, 1.5],
-    [0.5, 1.5, 1.5, 1.5, 0.5]
-  ];
+  // let filter = [
+  //   [0.5, 1.5, 1.5, 1.5, 0.5],
+  //   [1.5, 2.5, 3.0, 2.5, 1.5],
+  //   [1.5, 3.0, 5.0, 3.0, 1.5],
+  //   [1.5, 2.5, 3.0, 2.5, 1.5],
+  //   [0.5, 1.5, 1.5, 1.5, 0.5]
+  // ];
 
 
   if(w % factor !== 0 || h % factor !== 0){
@@ -255,10 +255,13 @@ function superSample(factor){ //if factor = 3 then we represent a 3x3 region in 
       //sum up values from larger array
       for(let m = 0; m < factor; m ++){ 
         for(let n = 0; n < factor; n++){
-          averageBlue += _pixels[channels*((factor*i*w + m) + (factor*j+n))];
-          averageGreen += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 1];
-          averageRed += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 2];
-          averageAlpha += _pixels[channels*((factor*i*w + m) + (factor*j+n)) + 3];
+
+          let weight = filter[m][n]
+
+          averageBlue += _pixels[channels*((factor*i*w + m) + (factor*j + n))];
+          averageGreen += _pixels[channels*((factor*i*w + m) + (factor*j + n)) + 1];
+          averageRed += _pixels[channels*((factor*i*w + m) + (factor*j + n)) + 2];
+          averageAlpha += _pixels[channels*((factor*i*w + m) + (factor*j + n)) + 3];
         }
       }
        averageRed /= k;
